@@ -15,6 +15,7 @@ const createReminderTable = () => {
             subject TEXT NOT NULL,
             description TEXT,
             nextExecution TEXT,
+            active INTEGER,
             FOREIGN KEY (user_id) REFERENCES Users (id)
         );
     `;
@@ -43,11 +44,11 @@ module.exports = {
     createReminder: (reminderData, callback) => {
         const query = `
             INSERT INTO Reminders
-            (user_id, type, weekbitmask, month, dayofmonth, hour, minute, subject, description, nextExecution)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+            (user_id, type, weekbitmask, month, dayofmonth, hour, minute, subject, description, nextExecution, active)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
         `;
-        const { user_id, type, weekbitmask, month, dayofmonth, hour, minute, subject, description, nextExecution } = reminderData;
-        db.run(query, [user_id, type, weekbitmask, month, dayofmonth, hour, minute, subject, description, nextExecution], function (err) {
+        const { user_id, type, weekbitmask, month, dayofmonth, hour, minute, subject, description, nextExecution, active } = reminderData;
+        db.run(query, [user_id, type, weekbitmask, month, dayofmonth, hour, minute, subject, description, nextExecution, active], function (err) {
             if (err) {
                 callback(err);
                 return;
@@ -61,11 +62,11 @@ module.exports = {
         const query = `
             UPDATE Reminders
             SET user_id = ?, type = ?, weekbitmask = ?, month = ?, dayofmonth = ?, hour = ?, minute = ?,
-                subject = ?, description = ?, nextExecution = ?
+                subject = ?, description = ?, nextExecution = ?, active = ?
             WHERE id = ?;
         `;
-        const { user_id, type, weekbitmask, month, dayofmonth, hour, minute, subject, description, nextExecution } = updatedData;
-        db.run(query, [user_id, type, weekbitmask, month, dayofmonth, hour, minute, subject, description, nextExecution, id], function (err) {
+        const { user_id, type, weekbitmask, month, dayofmonth, hour, minute, subject, description, nextExecution, active } = updatedData;
+        db.run(query, [user_id, type, weekbitmask, month, dayofmonth, hour, minute, subject, description, nextExecution, active, id], function (err) {
             if (err) {
                 callback(err);
                 return;

@@ -6,14 +6,29 @@ const createUserTable = () => {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT NOT NULL,
             password TEXT NOT NULL,
-            email TEXT NOT NULL
+            email TEXT NOT NULL,
+            role INT NOT NULL
         );
     `;
 
     db.run(query);
 };
 
+const createAdminUser = async () => {
+    const query = 'INSERT INTO Users (username, password, email, role) VALUES (?, ?, ?, ?);';
+    const username = 'admin';
+    const password = 'pw';
+    const email = 'admin@example.com';
+    const role = '0';
+
+    console.log('Going to wait before I\'ll insert the admin user');
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    db.run(query, [username, password, email, role]);
+    console.log('Inserted the admin user');
+};
+
 createUserTable();
+createAdminUser();
 
 module.exports = {
     getAllUsers: (callback) => {
@@ -27,9 +42,10 @@ module.exports = {
     },
 
     registerUser: (userData, callback) => {
-        const query = 'INSERT INTO Users (username, password, email) VALUES (?, ?, ?);';
+        const query = 'INSERT INTO Users (username, password, email, role) VALUES (?, ?, ?, ?);';
         const { username, password, email } = userData;
-        db.run(query, [username, password, email], function (err) {
+        const role = 1;
+        db.run(query, [username, password, email, role], function (err) {
             if (err) {
                 callback(err);
                 return;

@@ -6,9 +6,12 @@ const remindersRoutes = require('./reminders_api');
 const userRoutes = require('./users_api'); 
 const smtpSettingsRoutes = require('./smtpSettings_api');
 const reminderCheckerRoutes = require('./reminderChecker');
+const cors = require('cors')
 
 const app = express();
 const PORT = 8000;
+
+app.use(cors())
 
 app.use(bodyParser.json());
 
