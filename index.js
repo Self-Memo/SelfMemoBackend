@@ -1,12 +1,12 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const db = require('./db');
-const user = require('./models/user');
 const remindersRoutes = require('./reminders_api'); 
 const userRoutes = require('./users_api'); 
 const smtpSettingsRoutes = require('./smtpSettings_api');
 const reminderCheckerRoutes = require('./reminderChecker');
 const cors = require('cors')
+const cron = require('node-cron');
+const axios = require('axios');
 
 const app = express();
 const PORT = 8000;
@@ -28,6 +28,14 @@ app.use('/api/smtpsettings', smtpSettingsRoutes);
 
 // Use the reminderCheckerRoutes for the '/reminderChecker' endpoint
 app.use('/api', reminderCheckerRoutes);
+
+cron.schedule('* * * * *', async () => {
+    try {
+        await axios.get(`localhost:8000/api/reminders/reminderCheck`);
+    } catch (error) {
+        console.error('Error executing reminder check:', error.message);
+    }
+});
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);

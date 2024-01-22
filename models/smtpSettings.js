@@ -20,9 +20,17 @@ const createSmtpSettingsTable = () => {
 createSmtpSettingsTable();
 
 module.exports = {
-    getSmtpSettings: (callback) => {
-        const query = 'SELECT * FROM SmtpSettings;';
-        db.get(query, callback);
+    getSmtpSettings: () => {
+            return new Promise((resolve, reject) => {
+                const query = 'SELECT * FROM SmtpSettings;';
+                db.get(query, (err, settings) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(settings);
+                    }
+                });
+            });
     },
 
     getSmtpSettingsById: (id, callback) => {
