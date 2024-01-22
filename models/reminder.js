@@ -35,6 +35,11 @@ module.exports = {
         db.get(query, [id], callback);
     },
 
+    getReminderByUserId: (id, callback) => {
+        const query = 'SELECT * FROM Reminders WHERE user_id = ?;';
+        db.all(query, [id], callback);
+    },
+
     createReminder: (reminderData, callback) => {
         const query = `
             INSERT INTO Reminders

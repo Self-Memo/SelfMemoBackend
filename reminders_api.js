@@ -30,6 +30,19 @@ router.get('/:id', (req, res) => {
     });
 });
 
+// Get reminder by user ID
+router.get('/user/:id', (req, res) => {
+    const userId = req.params.id;
+
+    reminder.getReminderByUserId(userId, (err, reminders) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        res.json({ reminder: reminders });
+    });
+});
+
 // Create a new reminder
 router.post('/', (req, res) => {
     const newReminder = req.body;
