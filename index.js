@@ -6,7 +6,7 @@ const smtpSettingsRoutes = require('./smtpSettings_api');
 const reminderCheckerRoutes = require('./reminderChecker');
 const cors = require('cors')
 const cron = require('node-cron');
-const axios = require('axios');
+const http = require('http');
 
 const app = express();
 const PORT = 8000;
@@ -29,12 +29,20 @@ app.use('/api/smtpsettings', smtpSettingsRoutes);
 // Use the reminderCheckerRoutes for the '/reminderChecker' endpoint
 app.use('/api', reminderCheckerRoutes);
 
+const cronOptions = {
+    hostname: 'localhost',
+    port: 8000,
+    path: '/api/reminders/reminderCheck',
+    method: 'GET',
+};
+
 cron.schedule('* * * * *', async () => {
-    try {
-        await axios.get(`localhost:8000/api/reminders/reminderCheck`);
-    } catch (error) {
+
+    const req = http.request(cronOptions, () => {});
+    req.on('error', (error) => {
         console.error('Error executing reminder check:', error.message);
-    }
+    });
+    req.end();
 });
 
 app.listen(PORT, () => {
