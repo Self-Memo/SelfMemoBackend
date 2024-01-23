@@ -44,18 +44,18 @@ router.get('/reminderChecker', async (req, res) => {
                 });
 
                 if (success) {
-                    switch(reminder.type) {
-                        case "once": 
-                            reminder.deleteReminder(reminder.id, (err) => {
-                                if (err) {
-                                    console.error('Error deleting reminder:', err.message);
-                                } else {
-                                    console.log('Reminder deleted successfully.');
-                                }
-                            });
-                            break;
-                        default: break;
-                    }
+                    switch(expiredReminder.type) {
+                        case "once":
+                            reminder.deleteReminder(expiredReminder.id, (err) => {
+                                  if (err) {
+                                      console.error('Error deleting reminder:', err.message);
+                                  } else {
+                                      console.log('Reminder deleted successfully.');
+                                  }
+                              });
+                              break;
+                          default: break;
+                      }
                 }
                 
             }

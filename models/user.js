@@ -7,7 +7,8 @@ const createUserTable = () => {
             username TEXT NOT NULL,
             password TEXT NOT NULL,
             email TEXT NOT NULL,
-            role INT NOT NULL
+            role INT NOT NULL,
+            UNIQUE(username)
         );
     `;
 
@@ -15,7 +16,7 @@ const createUserTable = () => {
 };
 
 const createAdminUser = async () => {
-    const query = 'INSERT INTO Users (username, password, email, role) VALUES (?, ?, ?, ?);';
+    const query = 'INSERT OR IGNORE INTO Users (username, password, email, role) VALUES (?, ?, ?, ?);';
     const username = 'admin';
     const password = 'pw';
     const email = 'admin@example.com';
