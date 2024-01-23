@@ -20,17 +20,9 @@ const createSmtpSettingsTable = () => {
 createSmtpSettingsTable();
 
 module.exports = {
-    getSmtpSettings: () => {
-            return new Promise((resolve, reject) => {
-                const query = 'SELECT * FROM SmtpSettings;';
-                db.get(query, (err, settings) => {
-                    if (err) {
-                        reject(err);
-                    } else {
-                        resolve(settings);
-                    }
-                });
-            });
+    getSmtpSettings: (callback) => {
+        const query = 'SELECT * FROM SmtpSettings where id = (SELECT MAX(id) FROM SmtpSettings);';
+        db.get(query, callback);
     },
 
     getSmtpSettingsById: (id, callback) => {
