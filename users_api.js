@@ -42,4 +42,27 @@ router.post('/login', (req, res) => {
     });
 });
 
+router.put('/:id', (req, res) => {
+    const userId = req.params.id;
+    const userData = req.body;
+
+    user.updateUser(userId, userData, (err) => {
+        if (err) {
+            return res.status(500).json({ error: 'Failed to update user' });
+        }
+        res.json({ message: 'User updated successfully' });
+    });
+});
+
+router.delete('/:id', (req, res) => {
+    const userId = req.params.id;
+
+    user.deleteUserById(userId, (err) => {
+        if (err) {
+            return res.status(500).json({ error: 'Failed to delete user' });
+        }
+        res.json({ message: 'User deleted successfully' });
+    });
+});
+
 module.exports = router;

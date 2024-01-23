@@ -56,6 +56,12 @@ module.exports = {
         });
     },
 
+    updateUser: (userId, userData, callback) => {
+        const query = 'UPDATE Users SET username = ?, password = ?, email = ? WHERE id = ?;';
+        const values = [userData.username, userData.password, userData.email, userId];
+        db.run(query, values, callback);
+    },
+
     loginUser: (username, password, callback) => {
         const query = 'SELECT * FROM Users WHERE username = ? AND password = ?;';
         db.get(query, [username, password], callback);
@@ -66,5 +72,8 @@ module.exports = {
         db.get(query, [userId], callback);
     },
 
-    // Add more user-related functions as needed
+    deleteUserById: (userId, callback) => {
+        const query = 'DELETE FROM Users WHERE id = ?;';
+        db.run(query, [userId], callback);
+    },
 };
