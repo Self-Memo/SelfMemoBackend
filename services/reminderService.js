@@ -63,7 +63,7 @@ const calculateNextExecution = (currentReminder) => {
         case 1:
             console.log("ReCalculating Daily");
 
-            currentReminder.nextExecution = moment().utc(currentReminder.nextExecution).add(1, 'day')
+            currentReminder.nextExecution = moment().utc(currentReminder.nextExecution).add(1, 'day').format('YYYY-MM-DD HH:mm:ss')
             reminder.updateReminder(currentReminder.id, currentReminder);
             break;
         case 2:
@@ -89,12 +89,12 @@ const calculateNextExecution = (currentReminder) => {
             break;
         case 3:
             console.log("ReCalculating Monthly");
-            currentReminder.nextExecution = moment().utc(currentReminder.nextExecution).add(1, 'month')
+            currentReminder.nextExecution = moment().utc(currentReminder.nextExecution).add(1, 'month').format('YYYY-MM-DD HH:mm:ss')
             reminder.updateReminder(currentReminder.id, currentReminder);
             break;            
         case 4:
             console.log("ReCalculating Yearly");
-            currentReminder.nextExecution = moment().utc(currentReminder.nextExecution).add(1, 'year')
+            currentReminder.nextExecution = moment().utc(currentReminder.nextExecution).add(1, 'year').format('YYYY-MM-DD HH:mm:ss')
             reminder.updateReminder(currentReminder.id, currentReminder);
             break;
 
