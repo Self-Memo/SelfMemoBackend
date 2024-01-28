@@ -53,7 +53,7 @@ router.post('/', (req, res) => {
             return;
         }
         if (insertedReminder.type != 0)
-            service.calculateNextExecution(insertedReminder,false);
+            service.calculateInitialExecution(insertedReminder);
         res.status(201).json({ reminder: insertedReminder });
     });
 });
@@ -73,7 +73,7 @@ router.put('/:id', (req, res) => {
         }
         if (insertedReminder.type != 0)
             service.calculateNextExecution(insertedReminder);
-        
+
         res.json({ reminder: updatedData });
     });
 });
