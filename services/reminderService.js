@@ -50,6 +50,7 @@ const checkAndProcessReminders = async () => {
 const calculateNextExecution = (currentReminder, afterExecution) => {
     switch (currentReminder.type) {
         case 0:
+            console.log("Calculating Once");
             if (afterExecution) {
                 currentReminder.deleteReminder(currentReminder.id, (err) => {
                     if (err) {
@@ -64,6 +65,7 @@ const calculateNextExecution = (currentReminder, afterExecution) => {
             }
             break;
         case 1:
+            console.log("Calculating Daily");
             const currentDay = moment().day();
             let nextDay = currentDay;
             while ((currentReminder.weekbitmask & (1 << nextDay)) === 0) {
@@ -84,15 +86,18 @@ const calculateNextExecution = (currentReminder, afterExecution) => {
             currentReminder.nextExecution = nextExecution.format('YYYY-MM-DD HH:mm:ss')
             reminder.updateReminder(currentReminder);
             break;
-        case '2':
+        case 2:
+            console.log("Calculating Weekly");
             currentReminder.nextExecution = currentReminder.nextExecution.add(1, 'week')
             reminder.updateReminder(currentReminder);
             break;
-        case '3':
+        case 3:
+            console.log("Calculating Monthly");
             currentReminder.nextExecution = currentReminder.nextExecution.add(1, 'month')
             reminder.updateReminder(currentReminder);
             break;            
-        case '3':
+        case 4:
+            console.log("Calculating Yearly");
             currentReminder.nextExecution = currentReminder.nextExecution.add(1, 'year')
             reminder.updateReminder(currentReminder);
             break;
