@@ -6,7 +6,7 @@ const createReminderTable = () => {
         CREATE TABLE IF NOT EXISTS Reminders (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER,
-            type TEXT NOT NULL,
+            type INTEGER,
             weekbitmask INTEGER,
             month INTEGER,
             dayofmonth INTEGER,
