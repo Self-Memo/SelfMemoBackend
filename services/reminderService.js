@@ -49,7 +49,7 @@ const calculateNextExecution = (currentReminder) => {
     switch (currentReminder.type) {
         case 0:
             console.log("Deleting Once");
-            currentReminder.deleteReminder(currentReminder.id, (err) => {
+            reminder.deleteReminder(currentReminder.id, (err) => {
                 if (err) {
                     console.error('Error deleting reminder:', err.message);
                 } else {
