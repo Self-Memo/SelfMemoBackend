@@ -60,7 +60,8 @@ const calculateNextExecution = (currentReminder) => {
             break;
         case 1:
             console.log("ReCalculating Daily");
-            currentReminder.nextExecution = currentReminder.nextExecution.add(1, 'day')
+
+            currentReminder.nextExecution = moment().utc(currentReminder.nextExecution).add(1, 'day')
             reminder.updateReminder(currentReminder);
             break;
         case 2:
@@ -87,12 +88,12 @@ const calculateNextExecution = (currentReminder) => {
             break;
         case 3:
             console.log("ReCalculating Monthly");
-            currentReminder.nextExecution = currentReminder.nextExecution.add(1, 'month')
+            currentReminder.nextExecution = moment().utc(currentReminder.nextExecution).add(1, 'month')
             reminder.updateReminder(currentReminder);
             break;            
         case 4:
             console.log("ReCalculating Yearly");
-            currentReminder.nextExecution = currentReminder.nextExecution.add(1, 'year')
+            currentReminder.nextExecution = moment().utc(currentReminder.nextExecution).add(1, 'year')
             reminder.updateReminder(currentReminder);
             break;
 
@@ -106,12 +107,8 @@ const calculateInitialExecution = (currentReminder) => {
         case 1:
             console.log("Calculating Initial Daily");
             const nextExecution = moment().utc()
-                .set({
-                    hour: currentReminder.hour,
-                    minute: currentReminder.minute,
-                    second: 0,
-                    millisecond: 0,
-                });
+            .hour(currentReminder.hour)
+            .minute(currentReminder.minute);
 
             if (nextExecution.isBefore(moment().utc())) {
                 nextExecution.add(1, 'day');
@@ -128,12 +125,8 @@ const calculateInitialExecution = (currentReminder) => {
             }
             const nextWeeklyExecution = moment().utc()
             .day(nextDay)
-            .set({
-                hour: currentReminder.hour,
-                minute: currentReminder.minute,
-                second: 0,
-                millisecond: 0,
-            });
+            .hour(currentReminder.hour)
+            .minute(currentReminder.minute);
             if (nextWeeklyExecution.isBefore(moment().utc())) {
                 nextWeeklyExecution.add(1, 'week');
             }
@@ -144,12 +137,8 @@ const calculateInitialExecution = (currentReminder) => {
             console.log("Calculating Initial Monthly");
             const nextMonthlyExecution = moment().utc()
             .day(currentReminder.dayOfMonth)
-            .set({
-                hour: currentReminder.hour,
-                minute: currentReminder.minute,
-                second: 0,
-                millisecond: 0,
-            });
+            .hour(currentReminder.hour)
+            .minute(currentReminder.minute);
             if (nextMonthlyExecution.isBefore(moment().utc())) {
                 nextMonthlyExecution.add(1, 'month');
             }
@@ -161,12 +150,8 @@ const calculateInitialExecution = (currentReminder) => {
             const nextYearlyExecution = moment().utc()
             .month(currentReminder.month)
             .day(currentReminder.dayOfMonth)
-            .set({
-                hour: currentReminder.hour,
-                minute: currentReminder.minute,
-                second: 0,
-                millisecond: 0,
-            });
+            .hour(currentReminder.hour)
+            .minute(currentReminder.minute);
             if (nextYearlyExecution.isBefore(moment().utc())) {
                 nextYearlyExecution.add(1, 'year');
             }
