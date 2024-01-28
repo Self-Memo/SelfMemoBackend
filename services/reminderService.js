@@ -17,7 +17,6 @@ const checkAndProcessReminders = async () => {
             for (const expiredReminder of expiredReminders) {
                 // Get user email by user_id
                 const userId = expiredReminder.user_id;
-                var success = false;
                 user.getUserById(userId, (err, userData) => {
                     if (err) {
                         console.error('Error fetching user data:', err);
@@ -32,14 +31,13 @@ const checkAndProcessReminders = async () => {
     
                     emailService.sendEmail(recipientEmail, emailSubject, emailText)
                         .then(() => {
-                            success = true;
+                            calculateNextExecution(expiredReminder, true); 
                             console.log(`Email sent to ${recipientEmail}`);
                         })
                         .catch((emailError) => {
                             console.error('Error sending email:', emailError);
                         });
-                });
-                calculateNextExecution(expiredReminder,success)                               
+                });                          
             }
         });
     } catch (error) {
