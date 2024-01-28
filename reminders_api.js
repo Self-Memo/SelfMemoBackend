@@ -72,7 +72,8 @@ router.put('/:id', (req, res) => {
             return;
         }
         if (insertedReminder.type != 0)
-            service.calculateNextExecution(insertedReminder,false);
+            service.calculateNextExecution(insertedReminder);
+        
         res.json({ reminder: updatedData });
     });
 });

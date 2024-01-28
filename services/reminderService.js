@@ -31,7 +31,7 @@ const checkAndProcessReminders = async () => {
     
                     emailService.sendEmail(recipientEmail, emailSubject, emailText)
                         .then(() => {
-                            calculateNextExecution(expiredReminder, true); 
+                            calculateNextExecution(expiredReminder); 
                             console.log(`Email sent to ${recipientEmail}`);
                         })
                         .catch((emailError) => {
@@ -45,22 +45,17 @@ const checkAndProcessReminders = async () => {
     }
 };
 
-const calculateNextExecution = (currentReminder, afterExecution) => {
+const calculateNextExecution = (currentReminder) => {
     switch (currentReminder.type) {
         case 0:
-            console.log("Calculating Once");
-            if (afterExecution) {
-                currentReminder.deleteReminder(currentReminder.id, (err) => {
-                    if (err) {
-                        console.error('Error deleting reminder:', err.message);
-                    } else {
-                        console.log('Reminder deleted successfully.');
-                    }
-                });
-            }
-            else{
-            // check  
-            }
+            console.log("Deleting Once");
+            currentReminder.deleteReminder(currentReminder.id, (err) => {
+                if (err) {
+                    console.error('Error deleting reminder:', err.message);
+                } else {
+                    console.log('Reminder deleted successfully.');
+                }
+            });
             break;
         case 1:
             console.log("Calculating Daily");
