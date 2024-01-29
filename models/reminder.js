@@ -7,14 +7,14 @@ const createReminderTable = () => {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER,
             type INTEGER,
-            weekbitmask INTEGER,
+            daysOfWeekBitMask INTEGER,
             month INTEGER,
             dayofmonth INTEGER,
             hour INTEGER,
             minute INTEGER,
             subject TEXT NOT NULL,
-            description TEXT,
-            nextExecution TEXT,
+            additionalNotes TEXT,
+            nextEvent TEXT,
             active INTEGER,
             FOREIGN KEY (user_id) REFERENCES Users (id)
         );
@@ -44,11 +44,11 @@ module.exports = {
     createReminder: (reminderData, callback) => {
         const query = `
             INSERT INTO Reminders
-            (user_id, type, weekbitmask, month, dayofmonth, hour, minute, subject, description, nextExecution, active)
+            (user_id, type, daysOfWeekBitMask, month, dayofmonth, hour, minute, subject, additionalNotes, nextEvent, active)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
         `;
-        const { user_id, type, weekbitmask, month, dayofmonth, hour, minute, subject, description, nextExecution, active } = reminderData;
-        db.run(query, [user_id, type, weekbitmask, month, dayofmonth, hour, minute, subject, description, nextExecution, active], function (err) {
+        const { user_id, type, daysOfWeekBitMask, month, dayofmonth, hour, minute, subject, additionalNotes, nextEvent, active } = reminderData;
+        db.run(query, [user_id, type, daysOfWeekBitMask, month, dayofmonth, hour, minute, subject, additionalNotes, nextEvent, active], function (err) {
             if (err) {
                 callback(err);
                 return;
@@ -61,12 +61,12 @@ module.exports = {
     updateReminder: (id, updatedData, callback) => {
         const query = `
             UPDATE Reminders
-            SET user_id = ?, type = ?, weekbitmask = ?, month = ?, dayofmonth = ?, hour = ?, minute = ?,
-                subject = ?, description = ?, nextExecution = ?, active = ?
+            SET user_id = ?, type = ?, daysOfWeekBitMask = ?, month = ?, dayofmonth = ?, hour = ?, minute = ?,
+                subject = ?, additionalNotes = ?, nextEvent = ?, active = ?
             WHERE id = ?;
         `;
-        const { user_id, type, weekbitmask, month, dayofmonth, hour, minute, subject, description, nextExecution, active } = updatedData;
-        db.run(query, [user_id, type, weekbitmask, month, dayofmonth, hour, minute, subject, description, nextExecution, active, id], function (err) {
+        const { user_id, type, daysOfWeekBitMask, month, dayofmonth, hour, minute, subject, additionalNotes, nextEvent, active } = updatedData;
+        db.run(query, [user_id, type, daysOfWeekBitMask, month, dayofmonth, hour, minute, subject, additionalNotes, nextEvent, active, id], function (err) {
             if (err) {
                 callback(err);
                 return;
@@ -94,7 +94,7 @@ module.exports = {
     getExpiredReminders: (callback) => {
         const currentDateTime = moment().utc().format('YYYY-MM-DD HH:mm:ss');
         console.log(currentDateTime);
-        const query = 'SELECT * FROM Reminders WHERE nextExecution <= ?;';
+        const query = 'SELECT * FROM Reminders WHERE nextEvent <= ?;';
         db.all(query, [currentDateTime], callback);
     },
 
