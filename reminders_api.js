@@ -71,8 +71,8 @@ router.put('/:id', (req, res) => {
             res.status(404).json({ error: 'Reminder not found' });
             return;
         }
-        if (insertedReminder.type != 0)
-            service.calculateNextExecution(insertedReminder);
+        if (updatedData.type != 0)
+            service.calculateNextExecution(updatedData);
 
         res.json({ reminder: updatedData });
     });
