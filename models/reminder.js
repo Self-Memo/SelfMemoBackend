@@ -92,7 +92,7 @@ module.exports = {
     },
 
     getExpiredReminders: (callback) => {
-        const currentDateTime = moment().utc().format('YYYY-MM-DD HH:mm:ss');
+        const currentDateTime = moment().format('YYYY-MM-DD HH:mm:ss');
         console.log(currentDateTime);
         const query = 'SELECT * FROM Reminders WHERE nextEvent <= ?;';
         db.all(query, [currentDateTime], callback);
