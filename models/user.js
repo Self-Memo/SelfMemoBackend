@@ -33,7 +33,7 @@ createAdminUser();
 
 module.exports = {
     getAllUsers: (callback) => {
-        const query = 'SELECT `id`,`username`,`email` FROM Users;';
+        const query = 'SELECT `id`,`username`,`email`,`role` FROM Users;';
         db.all(query, callback);
     },
 
