@@ -1,5 +1,6 @@
 const express = require('express');
 const reminder = require('./models/reminder');
+const service = require('./services/reminderService');
 
 const router = express.Router();
 
@@ -51,6 +52,8 @@ router.post('/', (req, res) => {
             res.status(500).json({ error: err.message });
             return;
         }
+        if (insertedReminder.type != 0)
+            service.calculateInitialExecution(insertedReminder);
         res.status(201).json({ reminder: insertedReminder });
     });
 });
@@ -68,6 +71,9 @@ router.put('/:id', (req, res) => {
             res.status(404).json({ error: 'Reminder not found' });
             return;
         }
+        if (updatedData.type != 0)
+            service.calculateNextExecution(updatedData);
+
         res.json({ reminder: updatedData });
     });
 });

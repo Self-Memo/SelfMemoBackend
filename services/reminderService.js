@@ -1,6 +1,7 @@
 const reminder = require('../models/reminder');
 const emailService = require('./emailService');
 const user = require('../models/user');
+const moment = require('moment');
 
 
 const checkAndProcessReminders = async () => {
@@ -17,7 +18,6 @@ const checkAndProcessReminders = async () => {
             for (const expiredReminder of expiredReminders) {
                 // Get user email by user_id
                 const userId = expiredReminder.user_id;
-                var success = false;
                 user.getUserById(userId, (err, userData) => {
                     if (err) {
                         console.error('Error fetching user data:', err);
@@ -28,18 +28,17 @@ const checkAndProcessReminders = async () => {
     
                     // Send email using emailService
                     const emailSubject = expiredReminder.subject;
-                    const emailText = expiredReminder.description || '';
+                    const emailText = expiredReminder.additionalNotes || '';
     
                     emailService.sendEmail(recipientEmail, emailSubject, emailText)
                         .then(() => {
-                            success = true;
+                            calculateNextExecution(expiredReminder); 
                             console.log(`Email sent to ${recipientEmail}`);
                         })
                         .catch((emailError) => {
                             console.error('Error sending email:', emailError);
                         });
-                });
-                calculateNextExecution(expiredReminder,success)                               
+                });                          
             }
         });
     } catch (error) {
@@ -47,62 +46,146 @@ const checkAndProcessReminders = async () => {
     }
 };
 
-const calculateNextExecution = (currentReminder, afterExecution) => {
+const calculateNextExecution = (currentReminder) => {
+    var currentDay = moment().day();
+    let nextDay = 1 << (currentDay);
     switch (currentReminder.type) {
         case 0:
-            if (afterExecution) {
-                currentReminder.deleteReminder(currentReminder.id, (err) => {
-                    if (err) {
-                        console.error('Error deleting reminder:', err.message);
-                    } else {
-                        console.log('Reminder deleted successfully.');
-                    }
-                });
-            }
-            else{
-            // check  
-            }
+            console.log("Deleting Once");
+            reminder.deleteReminder(currentReminder.id, (err) => {
+                if (err) {
+                    console.error('Error deleting reminder:', err.message);
+                } else {
+                    console.log('Reminder deleted successfully.');
+                }
+            });
             break;
         case 1:
-            const currentDay = moment().day();
-            let nextDay = currentDay;
-            while ((currentReminder.weekbitmask & (1 << nextDay)) === 0) {
-                nextDay = (nextDay + 1) % 7;
-            }
-            const nextExecution = moment()
-                .day(nextDay)
-                .set({
-                    hour: currentReminder.hour,
-                    minute: currentReminder.minute,
-                    second: 0,
-                    millisecond: 0,
-                });
+            console.log("ReCalculating Daily");
 
-            if (nextExecution.isBefore(moment())) {
-                nextExecution.add(1, 'week');
+            while ((currentReminder.daysOfWeekBitMask & nextDay) === 0) {
+                currentDay = (currentDay + 1) % 7
+                nextDay = nextDay << 1;
             }
-            currentReminder.nextExecution = nextExecution.format('YYYY-MM-DD HH:mm:ss')
-            reminder.updateReminder(currentReminder);
+            const nextWeeklyExecution = moment()
+            .set({
+                'day': currentDay,
+                'hour': currentReminder.hour,
+                'minute': currentReminder.minute,
+                'second': 0
+            });
+
+            if (nextWeeklyExecution.isBefore(moment())) {
+                nextWeeklyExecution.add(1, 'week');
+            }
+            currentReminder.nextEvent = nextWeeklyExecution.utc().format('YYYY-MM-DD HH:mm:ss')
+            reminder.updateReminder(currentReminder.id, currentReminder);
             break;
-        case '2':
-            currentReminder.nextExecution = currentReminder.nextExecution.add(1, 'week')
-            reminder.updateReminder(currentReminder);
+        case 2:
+            console.log("ReCalculating Weekly");
+            currentReminder.nextEvent = moment().utc(currentReminder.nextEvent).add(1, 'week').format('YYYY-MM-DD HH:mm:ss')
+            reminder.updateReminder(currentReminder.id, currentReminder);
             break;
-        case '3':
-            currentReminder.nextExecution = currentReminder.nextExecution.add(1, 'month')
-            reminder.updateReminder(currentReminder);
+        case 3:
+            console.log("ReCalculating Monthly");
+            currentReminder.nextEvent = moment().utc(currentReminder.nextEvent).add(1, 'month').format('YYYY-MM-DD HH:mm:ss')
+            reminder.updateReminder(currentReminder.id, currentReminder);
             break;            
-        case '3':
-            currentReminder.nextExecution = currentReminder.nextExecution.add(1, 'year')
-            reminder.updateReminder(currentReminder);
+        case 4:
+            console.log("ReCalculating Yearly");
+            currentReminder.nextEvent = moment().utc(currentReminder.nextEvent).add(1, 'year').format('YYYY-MM-DD HH:mm:ss')
+            reminder.updateReminder(currentReminder.id, currentReminder);
             break;
 
         default:
-            return currentReminder.nextExecution;
+            return currentReminder.nextEvent;
+    }
+};
+
+const calculateInitialExecution = (currentReminder) => {
+    var currentDay = moment().day();
+    let nextDay = 1 << (currentDay);
+    switch (currentReminder.type) {
+        case 1:
+            console.log("Calculating Initial Daily");
+
+            while ((currentReminder.daysOfWeekBitMask & nextDay) === 0) {
+                currentDay = (currentDay + 1) % 7
+                nextDay = nextDay << 1;
+            }
+            const nextEvent = moment()
+            .set({
+                'day': currentDay,
+                'hour': currentReminder.hour,
+                'minute': currentReminder.minute,
+                'second': 0
+            });
+
+            if (nextEvent.isBefore(moment())) {
+                nextEvent.add(1, 'day');
+            }
+            currentReminder.nextEvent = nextEvent.utc().format('YYYY-MM-DD HH:mm:ss')
+            reminder.updateReminder(currentReminder.id,currentReminder);
+            break;
+        case 2:
+            console.log("Calculating Initial Weekly");
+
+            while ((currentReminder.daysOfWeekBitMask & nextDay) === 0) {
+                currentDay = (currentDay + 1) % 7
+                nextDay = nextDay << 1;
+            }
+            const nextWeeklyExecution = moment()
+            .set({
+                'day': currentDay,
+                'hour': currentReminder.hour,
+                'minute': currentReminder.minute,
+                'second': 0
+            });
+            if (nextWeeklyExecution.isBefore(moment())) {
+                nextWeeklyExecution.add(1, 'week');
+            }
+            currentReminder.nextEvent = nextWeeklyExecution.utc().format('YYYY-MM-DD HH:mm:ss')
+            reminder.updateReminder(currentReminder.id, currentReminder);
+            break;
+        case 3:
+            console.log("Calculating Initial Monthly");
+            const nextMonthlyExecution = moment()
+            .set({
+                'date': currentReminder.dayofmonth,
+                'hour': currentReminder.hour,
+                'minute': currentReminder.minute,
+                'second' : 0
+            });
+            if (nextMonthlyExecution.isBefore(moment())) {
+                nextMonthlyExecution.add(1, 'month');
+            }
+            currentReminder.nextEvent = nextMonthlyExecution.utc().format('YYYY-MM-DD HH:mm:ss')
+            console.log(currentReminder)
+            reminder.updateReminder(currentReminder.id, currentReminder);
+            break;
+        case 4:
+            console.log("Calculating Initial Yearly");
+            const nextYearlyExecution = moment()
+            .set({
+                'month': currentReminder.month,
+                'date': currentReminder.dayofmonth,
+                'hour': currentReminder.hour,
+                'minute': currentReminder.minute,
+                'second': 0
+            });
+            if (nextYearlyExecution.isBefore(moment())) {
+                nextYearlyExecution.add(1, 'year');
+            }
+            currentReminder.nextEvent = nextYearlyExecution.utc().format('YYYY-MM-DD HH:mm:ss')
+            reminder.updateReminder(currentReminder.id, currentReminder);
+            break;
+        default:
+            break;
     }
 };
 
 module.exports = {
     checkAndProcessReminders,
     calculateNextExecution,
+    calculateInitialExecution,
 };
